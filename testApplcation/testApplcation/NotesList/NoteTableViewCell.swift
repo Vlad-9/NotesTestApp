@@ -66,19 +66,15 @@ class NoteTableViewCell: UITableViewCell {
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "dd.MM.yyyy"
 
-        if model.title == "" || model.text?.string == "" {
+        if model.text?.string == "" {
+            self.descriptionLabel.text = "Нет описания"
+            self.titleLabel.text = model.title
+        }
+        else if model.title == "" {
+            self.titleLabel.text = model.text?.string
+            self.descriptionLabel.text = ""
 
-            if model.title == "" {
-
-                self.titleLabel.text = model.text?.string
-
-            } else {
-
-                self.titleLabel.text = model.title
-            }
-
-        } else {
-
+        } else { 
             self.titleLabel.text = model.title!
             self.descriptionLabel.text = model.text?.string
         }
