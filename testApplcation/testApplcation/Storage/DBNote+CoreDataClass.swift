@@ -11,6 +11,6 @@ import CoreData
 
 @objc(DBNote)
 public class DBNote: NSManagedObject {
-
+    
 }
 

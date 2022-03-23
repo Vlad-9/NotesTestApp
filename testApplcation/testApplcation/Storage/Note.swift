@@ -8,11 +8,11 @@
 import Foundation
 
 struct Note {
-      var id: String
-      var text: NSAttributedString?
-      var date: Date
-      var pinned: Bool
-      var title: String?
+    var id: String
+    var text: NSAttributedString?
+    var date: Date
+    var pinned: Bool
+    var title: String?
 
     init (dbNote: DBNote) {
         id = dbNote.id
@@ -22,4 +22,3 @@ struct Note {
         title = dbNote.title
     }
 }
-

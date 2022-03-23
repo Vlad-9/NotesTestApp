@@ -102,7 +102,7 @@ extension NotesPresenter: INotesPresenter {
 
             if let index = notes.firstIndex(where: { $0.id == note.id }) {
 
-                notes[index].pinned = !notes[index].pinned 
+                notes[index].pinned = !notes[index].pinned
                 try notesStorage.update(notes[index])
             }
 
@@ -113,29 +113,29 @@ extension NotesPresenter: INotesPresenter {
     }
     
     func getImage(atSring: NSAttributedString) -> UIImage? {
-      var imagesArray = [Any]()
+        var imagesArray = [Any]()
 
-      atSring.enumerateAttribute(
-        NSAttributedString.Key.attachment, in: NSRange(location: 0, length: atSring.length),
-        options: [],
-        using: { (value, range, stop) -> Void in
-          if value is NSTextAttachment {
-            let attachment: NSTextAttachment? = (value as? NSTextAttachment)
-            var image: UIImage? = nil
+        atSring.enumerateAttribute(
+            NSAttributedString.Key.attachment, in: NSRange(location: 0, length: atSring.length),
+            options: [],
+            using: { (value, range, stop) -> Void in
+                if value is NSTextAttachment {
+                    let attachment: NSTextAttachment? = (value as? NSTextAttachment)
+                    var image: UIImage? = nil
 
-            if (attachment?.image) != nil {
-              image = attachment?.image
-            } else {
-              image = attachment?.image(
-                forBounds: (attachment?.bounds)!, textContainer: nil, characterIndex: range.location)
-            }
+                    if (attachment?.image) != nil {
+                        image = attachment?.image
+                    } else {
+                        image = attachment?.image(
+                            forBounds: (attachment?.bounds)!, textContainer: nil, characterIndex: range.location)
+                    }
 
-            if image != nil {
-              imagesArray.append(image!)
-            }
-          }
-        })
+                    if image != nil {
+                        imagesArray.append(image!)
+                    }
+                }
+            })
 
-      return imagesArray.first as? UIImage
+        return imagesArray.first as? UIImage
     }
 }

@@ -14,7 +14,7 @@ struct CellModel {
     var image: UIImage?
 }
 
-class NoteTableViewCell: UITableViewCell {
+final class NoteTableViewCell: UITableViewCell {
 
     var titleLabel = UILabel()
     var descriptionLabel = UILabel()
@@ -74,17 +74,15 @@ class NoteTableViewCell: UITableViewCell {
             self.titleLabel.text = model.text?.string
             self.descriptionLabel.text = ""
 
-        } else { 
+        } else {
             self.titleLabel.text = model.title!
             self.descriptionLabel.text = model.text?.string
         }
 
         let view = UIImageView(image: model.image?.resized(to: CGSize(width: 40.0, height: 40.0)))
-
         view.layer.cornerRadius = 5
         view.layer.masksToBounds = true
         self.accessoryView = view
         self.dateLabel.text = dateFormatter.string(from: model.date)
-
-        }
+    }
 }

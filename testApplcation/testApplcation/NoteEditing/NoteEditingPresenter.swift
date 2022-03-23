@@ -19,15 +19,15 @@ protocol INoteEditingPresenter {
 }
 
 final class NoteEditingPresenter {
-
+    
     // MARK: - Dependencies
-
+    
     private(set) var note: Note
     var onClose: ((_ updatedNote: Note) -> Void)?
     weak var view: INoteEditingViewController?
-
+    
     // MARK: - Initializers
-
+    
     init(note: Note) {
         self.note = note
     }
@@ -40,7 +40,7 @@ extension NoteEditingPresenter: INoteEditingPresenter {
         let dateFormatter = DateFormatter()
         dateFormatter.locale =  Locale(identifier: "ru_RU")
         dateFormatter.dateFormat = "dd MMMM yyyy г. в HH:mm"
-
+        
         let date = dateFormatter.string(from: note.date)
         let viewModel = NoteEditingViewModel(
             title: note.title ?? "",
@@ -49,11 +49,11 @@ extension NoteEditingPresenter: INoteEditingPresenter {
         )
         view?.configure(with: viewModel)
     }
-
+    
     func userDidTapBackButton() {
         view?.close()
     }
-
+    
     func userWillCloseNoteEditingScreen(title: String, text: NSAttributedString, date: Date) {
         note.title = title
         note.text =  text

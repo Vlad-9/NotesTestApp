@@ -37,25 +37,25 @@ final class NotesStorage: INotesStorage {
         guard let context = viewContext else { throw NotesStorageError.conntextIsMissing }
         let request  = NSFetchRequest<NSFetchRequestResult>(entityName: "DBNote")
 
-            if let results = try context.fetch(request) as? [DBNote]  { 
-                dbnotes = results
-                return  results.map { dbNote in
-                    Note(dbNote: dbNote)
-                }
+        if let results = try context.fetch(request) as? [DBNote]  {
+            dbnotes = results
+            return  results.map { dbNote in
+                Note(dbNote: dbNote)
             }
+        }
 
         return []
     }
-     func createBlankNote() throws -> Note {
-         guard let context = viewContext else { throw NotesStorageError.conntextIsMissing }
-         let blankNote = DBNote(context: context)
-         blankNote.title = ""
-         blankNote.text = NSAttributedString(string:"")
-         blankNote.pinned = false
-         blankNote.id = UUID().uuidString
-         blankNote.date = Date()
-         try context.save()
-         dbnotes.append(blankNote)
+    func createBlankNote() throws -> Note {
+        guard let context = viewContext else { throw NotesStorageError.conntextIsMissing }
+        let blankNote = DBNote(context: context)
+        blankNote.title = ""
+        blankNote.text = NSAttributedString(string:"")
+        blankNote.pinned = false
+        blankNote.id = UUID().uuidString
+        blankNote.date = Date()
+        try context.save()
+        dbnotes.append(blankNote)
 
         return Note(dbNote: blankNote)
     }
@@ -78,12 +78,12 @@ final class NotesStorage: INotesStorage {
         
         noteFromDB?.pinned = note.pinned
         try context.save()
-    
+
     }
 
     func delete(_ note: Note) throws {
         guard let context = viewContext else { throw NotesStorageError.conntextIsMissing }
-        guard let noteFromDB = dbnotes.first(where: { $0.id == note.id }) else { return } 
+        guard let noteFromDB = dbnotes.first(where: { $0.id == note.id }) else { return }
         dbnotes.removeAll(where: { $0.id == note.id })
 
         context.delete(noteFromDB)

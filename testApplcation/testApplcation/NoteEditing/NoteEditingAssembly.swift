@@ -15,7 +15,7 @@ protocol INoteEditingAssembly {
 }
 
 final class NoteEditingAssembly: INoteEditingAssembly {
-
+    
     func createNoteEditingViewController(
         note: Note,
         onEditingFinish: @escaping (_ updatedNote: Note) -> Void
