@@ -119,6 +119,7 @@
 		F50C6CFC27E3DB2F0086E66F /* testApplcation */ = {
 			isa = PBXGroup;
 			children = (
+				F51188E327EBB3C700E29E68 /* Models */,
 				F5966E0B27EA7844002D027C /* Storage */,
 				F50C6D4827E6832A0086E66F /* NotesList */,
 				F50C6D3A27E672570086E66F /* NoteEditing */,
@@ -170,12 +171,19 @@
 			path = NotesList;
 			sourceTree = "<group>";
 		};
+		F51188E327EBB3C700E29E68 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				F50C6D5427E75EA30086E66F /* Note.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
 		F5966E0B27EA7844002D027C /* Storage */ = {
 			isa = PBXGroup;
 			children = (
-				F50C6D5127E75E7E0086E66F /* DBNote+CoreDataProperties.swift */,
 				F50C6D5027E75E7E0086E66F /* DBNote+CoreDataClass.swift */,
-				F50C6D5427E75EA30086E66F /* Note.swift */,
+				F50C6D5127E75E7E0086E66F /* DBNote+CoreDataProperties.swift */,
 				F50C6D4E27E72F820086E66F /* NotesStorage.swift */,
 			);
 			path = Storage;

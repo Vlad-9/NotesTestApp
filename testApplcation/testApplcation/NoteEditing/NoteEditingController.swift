@@ -8,6 +8,8 @@
 import UIKit
 import CoreData
 
+// MARK: - Model
+
 struct NoteEditingViewModel {
     let title: String
     let text: NSAttributedString

@@ -7,6 +7,8 @@
 
 import UIKit
 
+// MARK: - Model
+
 struct CellModel {
     var title: String?
     var text: NSAttributedString?
@@ -14,15 +16,33 @@ struct CellModel {
     var image: UIImage?
 }
 
+protocol NoteTableViewCellConfigurable {
+
+    func configure(model: CellModel)
+}
+
 final class NoteTableViewCell: UITableViewCell {
+    
+    // MARK: - Properties
 
     var titleLabel = UILabel()
     var descriptionLabel = UILabel()
     var dateLabel = UILabel()
 
+    // MARK: - Initializers
+
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
+        setupUI()
+    }
 
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+
+    // MARK: - UI Elements
+    
+    private func setupUI() {
         contentView.addSubview(titleLabel)
         contentView.addSubview(descriptionLabel)
         contentView.addSubview(dateLabel)
@@ -57,11 +77,12 @@ final class NoteTableViewCell: UITableViewCell {
             dateLabel.bottomAnchor.constraint(equalTo: contentView.bottomAnchor,constant: -8),
         ])
     }
+}
 
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-    
+// MARK: - NoteTableViewCellConfigurable
+
+extension NoteTableViewCell: NoteTableViewCellConfigurable {
+
     func configure(model: CellModel) {
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "dd.MM.yyyy"
