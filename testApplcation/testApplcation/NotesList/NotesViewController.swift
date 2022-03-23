@@ -79,6 +79,7 @@ final class NotesViewController: UIViewController {
     }
 
     @objc private func userDidRequestCreateNewNote() {
+
         presenter.userDidRequestCreate()
     }
 
@@ -135,7 +136,9 @@ extension NotesViewController: INotesViewController {
     }
 
     func showAlert(with error: Error) {
-        print ("Error")
+        let alert = UIAlertController(title: "Ошибка", message: error.localizedDescription , preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "Закрыть", style: UIAlertAction.Style.default, handler: nil))
+        self.present(alert, animated: true, completion: nil)
     }
 }
 

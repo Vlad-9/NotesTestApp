@@ -194,7 +194,9 @@ extension NoteEditingViewController: INoteEditingViewController {
     }
     
     func showAlert(with error: Error) {
-        print("Error") //TODO
+        let alert = UIAlertController(title: "Ошибка", message: error.localizedDescription , preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "Закрыть", style: UIAlertAction.Style.default, handler: nil))
+        self.present(alert, animated: true, completion: nil)
     }
     
     func close() {
