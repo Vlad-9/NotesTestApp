@@ -14,10 +14,11 @@ enum NotesStorageError: Error {
 
 protocol INotesStorage {
     func fetchNotes() throws -> [Note]
-    func createBlankNote() throws -> Note
+    func createBlankNote(text: String ,title: String) throws -> Note 
     func delete(_ note: Note) throws
     func update(_ note: Note) throws
     func pin (_ note: Note) throws
+
 }
 
 final class NotesStorage: INotesStorage {
@@ -46,11 +47,11 @@ final class NotesStorage: INotesStorage {
 
         return []
     }
-    func createBlankNote() throws -> Note {
+    func createBlankNote(text: String ,title: String) throws -> Note {
         guard let context = viewContext else { throw NotesStorageError.conntextIsMissing }
         let blankNote = DBNote(context: context)
-        blankNote.title = ""
-        blankNote.text = NSAttributedString(string:"")
+        blankNote.title = title
+        blankNote.text = NSAttributedString(string:text)
         blankNote.pinned = false
         blankNote.id = UUID().uuidString
         blankNote.date = Date()

@@ -50,20 +50,32 @@ final class NotesPresenter {
 
         pinnedNotes = filtered
     }
+
+    private func createFirstNoteIfNeeded() {
+        if notes.isEmpty {
+            do {
+                try notesStorage.createBlankNote(text:"Описание", title:"Пустая заметка")
+            } catch {
+                view?.showAlert(with: error)
+            }
+        }
+    }
     // MARK: - Lifecycle
 
     func viewDidLoad() {
         notes = (try? notesStorage.fetchNotes()) ?? []
         view?.update(notes)
+        createFirstNoteIfNeeded()
     }
 }
 
 // MARK: - INotesPresenter
 
 extension NotesPresenter: INotesPresenter {
+
     func userDidRequestCreate() {
         do {
-            let note = try notesStorage.createBlankNote()
+            let note =  try notesStorage.createBlankNote(text:"", title:"")
             view?.openNoteEditingScreen(with: note)
         } catch {
             view?.showAlert(with: error)
