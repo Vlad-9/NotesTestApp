@@ -29,7 +29,7 @@ class NoteEditingViewController: UIViewController {
     private let presenter: INoteEditingPresenter
     
     // MARK: - UI Elements
-    
+
     private lazy var textView: UITextView = {
         let textView = UITextView()
         textView.font = .systemFont(ofSize: 15.0)
@@ -69,12 +69,6 @@ class NoteEditingViewController: UIViewController {
         target: self,
         action: #selector(increaseSelectedFontSize)
     )
-    private lazy var changeFontNameBarItem = UIBarButtonItem(
-        image: UIImage(systemName: "textformat.abc"),
-        style: .plain,
-        target: self,
-        action: #selector(changeSelectedTextFont)
-    )
 
     private lazy var decreaseFontSizeBarItem = UIBarButtonItem(
         image: UIImage(systemName: "minus.circle"),
@@ -83,18 +77,11 @@ class NoteEditingViewController: UIViewController {
         action: #selector(decreaseSelectedFontSize)
     )
 
-    private lazy var changeTextAlignmentBarItem = UIBarButtonItem(
-        image: UIImage(systemName: "text.justify"),
-        style: .plain,
-        target: self,
-        action: #selector(changeTextAlignment)
-    )
-
     private lazy var changeTextColorBarItem = UIBarButtonItem(
         image: UIImage(systemName: "paintbrush.pointed"),
         style: .plain,
         target: self,
-        action: #selector(changeSelectedTextColor)
+        action: #selector(callColorPicker)
     )
     
     private lazy var endEditingBarItem = UIBarButtonItem(
@@ -103,6 +90,29 @@ class NoteEditingViewController: UIViewController {
         target: self,
         action: #selector(hideKeyboard)
     )
+
+    lazy var helveticaFont = UIAction(title: "Helvetica") { (action) in
+        self.changeSelectedTextFontWithName(font: "Helvetica")
+    }
+    lazy var courierFont = UIAction(title: "Courier") { (action) in
+
+        self.changeSelectedTextFontWithName(font: "CourierNewPSMT")
+    }
+    lazy var timesNewRomanFont = UIAction(title: "Times New Roman") { (action) in
+
+        self.changeSelectedTextFontWithName(font: "TimesNewRomanPSMT")
+    }
+    lazy var menuFont = UIMenu(title: "Шрифт", options: .displayInline, children: [helveticaFont , courierFont , timesNewRomanFont])
+    lazy var leftItem = UIAction(title: "По левому краю", image: UIImage(systemName: "text.alignleft")) { (action) in
+        self.textView.textAlignment = .left
+    }
+    lazy var centerItem = UIAction(title: "По центру", image: UIImage(systemName: "text.aligncenter")) { (action) in
+        self.textView.textAlignment = .center
+    }
+    lazy var rightItem = UIAction(title: "По правому краю", image: UIImage(systemName: "text.alignright")) { (action) in
+        self.textView.textAlignment = .right
+    }
+    lazy var menuAlign = UIMenu(title: "Выравнивание", options: .displayInline, children: [leftItem , centerItem , rightItem])
     
     // MARK: - Initializers
     
@@ -153,6 +163,12 @@ class NoteEditingViewController: UIViewController {
         present(vc, animated: true)
     }
 
+    @objc func callColorPicker() {
+        let pickerC = UIColorPickerViewController()
+        pickerC.delegate = self
+        present(pickerC, animated: true, completion: nil)
+    }
+
     @objc private func changeTextAlignment() {
         switch  textView.textAlignment {
         case .left:
@@ -166,59 +182,19 @@ class NoteEditingViewController: UIViewController {
         }
     }
 
-    @objc private func changeSelectedTextFont() {
+    private func changeSelectedTextColorWithName(font: UIColor) {
+        let selectedText = textView.selectedRange
+        let myAttribute = [  NSAttributedString.Key.foregroundColor: font]
+        textView.textStorage.addAttributes(myAttribute, range: selectedText)
+    }
+
+    private func changeSelectedTextFontWithName(font: String) {
         let selectedText = textView.selectedRange
         textView.attributedText.enumerateAttribute(.font, in: selectedText) { (value, range, stop) in
             if let oldFontName = value as? UIFont {
-
-                var newFontName = ""
-                switch oldFontName.fontName {
-                case "Helvetica":
-                    newFontName = "TimesNewRomanPSMT"
-                case "TimesNewRomanPSMT":
-                    newFontName = "CourierNewPSMT"
-                case "CourierNewPSMT":
-                    newFontName = "AmericanTypewriter"
-                case "AmericanTypewriter":
-                    newFontName = "Georgia"
-                case "Georgia":
-                    newFontName = "Helvetica"
-                default:
-                    newFontName = "Helvetica"
-                }
-                let myAttribute = [  NSAttributedString.Key.font: UIFont (name: newFontName, size: oldFontName.pointSize)]
+                let myAttribute = [  NSAttributedString.Key.font: UIFont (name: font, size: oldFontName.pointSize)]
                 textView.textStorage.addAttributes(myAttribute, range: selectedText)
             }
-        }
-    }
-
-    @objc private func changeSelectedTextColor() {
-        let selectedText = textView.selectedRange
-        var newColor = UIColor.systemRed
-
-        textView.attributedText.enumerateAttribute(.foregroundColor, in: selectedText) { (value, range, stop) in
-
-            if let oldColor = value as? UIColor
-            {
-                switch oldColor {
-                case .label:
-                    newColor = .systemRed
-                case .systemRed:
-                    newColor = .systemGreen
-                case .systemGreen:
-                    newColor = .customColor
-                case .customColor:
-                    newColor = .systemBlue
-                case .systemBlue:
-                    newColor = .systemGray2
-                case .systemGray2:
-                    newColor = .label
-                default:
-                    newColor = .systemRed
-                }
-            }
-            let myAttribute = [  NSAttributedString.Key.foregroundColor: newColor]
-            textView.textStorage.addAttributes(myAttribute, range: selectedText)
         }
     }
 
@@ -251,7 +227,6 @@ class NoteEditingViewController: UIViewController {
     }
 
     @objc private func kyeboardWillAppear(notification: NSNotification) {
-
         let info = notification.userInfo!
         var value = (info[UIResponder.keyboardFrameEndUserInfoKey] as! NSValue).cgRectValue
         value = self.textView.convert(value, from:nil)
@@ -260,6 +235,7 @@ class NoteEditingViewController: UIViewController {
         navigationItem.rightBarButtonItem = endEditingBarItem
 
     }
+
     private func setupUI() {
         NotificationCenter.default.addObserver(self, selector: #selector(kyeboardWillAppear), name: UIResponder.keyboardWillShowNotification, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillDisappear), name: UIResponder.keyboardWillHideNotification, object: nil)
@@ -267,18 +243,15 @@ class NoteEditingViewController: UIViewController {
         let bar = UIToolbar()
         let flexibleSpace = UIBarButtonItem(barButtonSystemItem: UIBarButtonItem.SystemItem.flexibleSpace, target: nil, action: nil);
         bar.backgroundColor = .systemGray
-        bar.items = [increaseFontSizeBarItem,decreaseFontSizeBarItem,changeTextAlignmentBarItem,changeFontNameBarItem,changeTextColorBarItem,flexibleSpace,addImageBarItem]
+        bar.tintColor = .customColor
+        bar.items = [increaseFontSizeBarItem,decreaseFontSizeBarItem,UIBarButtonItem(image:  UIImage(systemName: "text.aligncenter"), menu: menuAlign) ,
+                     UIBarButtonItem(image:  UIImage(systemName: "textformat.alt"), menu: menuFont) ,
+                     changeTextColorBarItem ,flexibleSpace,addImageBarItem]
         bar.sizeToFit()
 
         textView.inputAccessoryView = bar
         dateLabel.backgroundColor = .systemBackground
         titleTextField.backgroundColor = .systemBackground
-        addImageBarItem.tintColor = .customColor
-        changeFontNameBarItem.tintColor = .customColor
-        increaseFontSizeBarItem.tintColor = .customColor
-        decreaseFontSizeBarItem.tintColor = .customColor
-        changeTextAlignmentBarItem.tintColor = .customColor
-        changeTextColorBarItem.tintColor = .customColor
         textView.textColor = .label
         textView.setContentOffset(CGPoint(x: 0, y: bottom), animated: true)
 
@@ -334,6 +307,8 @@ extension NoteEditingViewController: INoteEditingViewController {
     }
 }
 
+// MARK: - UIImagePickerControllerDelegate,UINavigationControllerDelegate
+
 extension NoteEditingViewController : UIImagePickerControllerDelegate, UINavigationControllerDelegate {
     
     func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
@@ -371,5 +346,14 @@ extension NoteEditingViewController {
         let tapGesture = UITapGestureRecognizer(target: self,
                                                 action: #selector(hideKeyboard))
         view.addGestureRecognizer(tapGesture)
+    }
+}
+
+// MARK: - UIColorPickerViewControllerDelegate
+
+extension NoteEditingViewController: UIColorPickerViewControllerDelegate {
+    func colorPickerViewControllerDidSelectColor(_ viewController: UIColorPickerViewController) {
+        let color = viewController.selectedColor
+        changeSelectedTextColorWithName(font: color)
     }
 }
