@@ -63,6 +63,39 @@ class NoteEditingViewController: UIViewController {
         target: self,
         action: #selector(addPhotoFromLibrary)
     )
+    private lazy var increaseFontSizeBarItem = UIBarButtonItem(
+        image: UIImage(systemName: "plus.circle"),
+        style: .plain,
+        target: self,
+        action: #selector(increaseSelectedFontSize)
+    )
+    private lazy var changeFontNameBarItem = UIBarButtonItem(
+        image: UIImage(systemName: "textformat.abc"),
+        style: .plain,
+        target: self,
+        action: #selector(changeSelectedTextFont)
+    )
+
+    private lazy var decreaseFontSizeBarItem = UIBarButtonItem(
+        image: UIImage(systemName: "minus.circle"),
+        style: .plain,
+        target: self,
+        action: #selector(decreaseSelectedFontSize)
+    )
+
+    private lazy var changeTextAlignmentBarItem = UIBarButtonItem(
+        image: UIImage(systemName: "text.justify"),
+        style: .plain,
+        target: self,
+        action: #selector(changeTextAlignment)
+    )
+
+    private lazy var changeTextColorBarItem = UIBarButtonItem(
+        image: UIImage(systemName: "paintbrush.pointed"),
+        style: .plain,
+        target: self,
+        action: #selector(changeSelectedTextColor)
+    )
     
     private lazy var endEditingBarItem = UIBarButtonItem(
         title: "Готово",
@@ -113,44 +146,139 @@ class NoteEditingViewController: UIViewController {
     }
     
     @objc private func addPhotoFromLibrary() {
-        
         let vc = UIImagePickerController()
         vc.sourceType = .photoLibrary
         vc.delegate = self
         vc.allowsEditing = true
         present(vc, animated: true)
     }
-    
+
+    @objc private func changeTextAlignment() {
+        switch  textView.textAlignment {
+        case .left:
+            textView.textAlignment = .center
+
+        case .right:
+            textView.textAlignment = .left
+
+        default:
+            textView.textAlignment = .right
+        }
+    }
+
+    @objc private func changeSelectedTextFont() {
+        let selectedText = textView.selectedRange
+        textView.attributedText.enumerateAttribute(.font, in: selectedText) { (value, range, stop) in
+            if let oldFontName = value as? UIFont {
+
+                var newFontName = ""
+                switch oldFontName.fontName {
+                case "Helvetica":
+                    newFontName = "TimesNewRomanPSMT"
+                case "TimesNewRomanPSMT":
+                    newFontName = "CourierNewPSMT"
+                case "CourierNewPSMT":
+                    newFontName = "AmericanTypewriter"
+                case "AmericanTypewriter":
+                    newFontName = "Georgia"
+                case "Georgia":
+                    newFontName = "Helvetica"
+                default:
+                    newFontName = "Helvetica"
+                }
+                let myAttribute = [  NSAttributedString.Key.font: UIFont (name: newFontName, size: oldFontName.pointSize)]
+                textView.textStorage.addAttributes(myAttribute, range: selectedText)
+            }
+        }
+    }
+
+    @objc private func changeSelectedTextColor() {
+        let selectedText = textView.selectedRange
+        var newColor = UIColor.systemRed
+
+        textView.attributedText.enumerateAttribute(.foregroundColor, in: selectedText) { (value, range, stop) in
+
+            if let oldColor = value as? UIColor
+            {
+                switch oldColor {
+                case .label:
+                    newColor = .systemRed
+                case .systemRed:
+                    newColor = .systemGreen
+                case .systemGreen:
+                    newColor = .customColor
+                case .customColor:
+                    newColor = .systemBlue
+                case .systemBlue:
+                    newColor = .systemGray2
+                case .systemGray2:
+                    newColor = .label
+                default:
+                    newColor = .systemRed
+                }
+            }
+            let myAttribute = [  NSAttributedString.Key.foregroundColor: newColor]
+            textView.textStorage.addAttributes(myAttribute, range: selectedText)
+        }
+    }
+
+    @objc private func decreaseSelectedFontSize() {
+        let selectedText = textView.selectedRange
+        textView.attributedText.enumerateAttribute(.font, in: selectedText) { (value, range, stop) in
+            if let oldFont = value as? UIFont {
+                let myAttribute = [  NSAttributedString.Key.font: oldFont.withSize(oldFont.pointSize-1)]
+                textView.textStorage.addAttributes(myAttribute, range: selectedText)
+            }
+        }
+    }
+
+    @objc private func increaseSelectedFontSize() {
+        let selectedText = textView.selectedRange
+        textView.attributedText.enumerateAttribute(.font, in: selectedText) { (value, range, stop) in
+            if let oldFont = value as? UIFont {
+
+                let myAttribute = [  NSAttributedString.Key.font:  oldFont.withSize(oldFont.pointSize+1)]
+                textView.textStorage.addAttributes(myAttribute, range: selectedText)
+            }
+        }
+    }
+
     @objc private func keyboardWillDisappear(notification: NSNotification) {
         navigationItem.rightBarButtonItem = nil
         let contentInsets = UIEdgeInsets.zero
         self.textView.contentInset = contentInsets
         self.textView.verticalScrollIndicatorInsets = contentInsets
     }
-    
+
     @objc private func kyeboardWillAppear(notification: NSNotification) {
-        
+
         let info = notification.userInfo!
         var value = (info[UIResponder.keyboardFrameEndUserInfoKey] as! NSValue).cgRectValue
         value = self.textView.convert(value, from:nil)
         self.textView.contentInset.bottom = value.size.height
         self.textView.verticalScrollIndicatorInsets.bottom = value.size.height
         navigationItem.rightBarButtonItem = endEditingBarItem
-        
+
     }
     private func setupUI() {
         NotificationCenter.default.addObserver(self, selector: #selector(kyeboardWillAppear), name: UIResponder.keyboardWillShowNotification, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillDisappear), name: UIResponder.keyboardWillHideNotification, object: nil)
         let bottom = textView.contentSize.height
         let bar = UIToolbar()
+        let flexibleSpace = UIBarButtonItem(barButtonSystemItem: UIBarButtonItem.SystemItem.flexibleSpace, target: nil, action: nil);
         bar.backgroundColor = .systemGray
-        bar.items = [addImageBarItem]
+        bar.items = [increaseFontSizeBarItem,decreaseFontSizeBarItem,changeTextAlignmentBarItem,changeFontNameBarItem,changeTextColorBarItem,flexibleSpace,addImageBarItem]
         bar.sizeToFit()
 
         textView.inputAccessoryView = bar
         dateLabel.backgroundColor = .systemBackground
         titleTextField.backgroundColor = .systemBackground
         addImageBarItem.tintColor = .customColor
+        changeFontNameBarItem.tintColor = .customColor
+        increaseFontSizeBarItem.tintColor = .customColor
+        decreaseFontSizeBarItem.tintColor = .customColor
+        changeTextAlignmentBarItem.tintColor = .customColor
+        changeTextColorBarItem.tintColor = .customColor
         textView.textColor = .label
         textView.setContentOffset(CGPoint(x: 0, y: bottom), animated: true)
 
@@ -160,20 +288,20 @@ class NoteEditingViewController: UIViewController {
         view.addSubview(dateLabel)
         view.addSubview(titleTextField)
         view.addSubview(textView)
-        
+
         textView.setContentHuggingPriority(.defaultHigh , for: .vertical)
         textView.setContentCompressionResistancePriority(.defaultHigh , for: .vertical)
-        
+
         titleTextField.setContentHuggingPriority(.defaultLow , for: .vertical)
         titleTextField.setContentCompressionResistancePriority(.defaultLow , for: .vertical)
-        
+
         NSLayoutConstraint.activate([
             titleTextField.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 8),
             titleTextField.topAnchor.constraint(equalTo: dateLabel.bottomAnchor,constant: 0),
             titleTextField.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             titleTextField.bottomAnchor.constraint(equalTo: textView.topAnchor),
             textView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 8),
-            textView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            textView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -8),
             textView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -8),
             dateLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             dateLabel.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor,constant: 8),
@@ -218,6 +346,7 @@ extension NoteEditingViewController : UIImagePickerControllerDelegate, UINavigat
             result.append(oldText)
             result.append(NSAttributedString(attachment: image1Attachment))
             textView.attributedText =  result
+
         }
         picker.dismiss(animated: true, completion: nil)
     }
