@@ -104,13 +104,16 @@ class NoteEditingViewController: UIViewController {
     }
     lazy var menuFont = UIMenu(title: "Шрифт", options: .displayInline, children: [helveticaFont , courierFont , timesNewRomanFont])
     lazy var leftItem = UIAction(title: "По левому краю", image: UIImage(systemName: "text.alignleft")) { (action) in
-        self.textView.textAlignment = .left
+      //  self.textView.textAlignment = .left
+        self.changeTextAlignment(alignment: .left)
     }
     lazy var centerItem = UIAction(title: "По центру", image: UIImage(systemName: "text.aligncenter")) { (action) in
-        self.textView.textAlignment = .center
+     //   self.textView.textAlignment = .center
+        self.changeTextAlignment(alignment: .center)
     }
     lazy var rightItem = UIAction(title: "По правому краю", image: UIImage(systemName: "text.alignright")) { (action) in
-        self.textView.textAlignment = .right
+       // self.textView.textAlignment = .right
+        self.changeTextAlignment(alignment: .right)
     }
     lazy var menuAlign = UIMenu(title: "Выравнивание", options: .displayInline, children: [leftItem , centerItem , rightItem])
     
@@ -169,18 +172,23 @@ class NoteEditingViewController: UIViewController {
         present(pickerC, animated: true, completion: nil)
     }
 
-    @objc private func changeTextAlignment() {
-        switch  textView.textAlignment {
-        case .left:
-            textView.textAlignment = .center
+    private func changeTextAlignment(alignment: NSTextAlignment) {
 
-        case .right:
-            textView.textAlignment = .left
+        let string = textView.attributedText.string
+        let selectedRange = textView.selectedRange
 
-        default:
-            textView.textAlignment = .right
-        }
+        var currentLineRange: NSRange {
+              let nsText = string as NSString
+              let currentRange = nsText.lineRange(for:selectedRange)
+              return currentRange
+          }
+       
+        let paragraph = NSMutableParagraphStyle()
+        paragraph.alignment = alignment
+        let myAttribute = [  NSAttributedString.Key.paragraphStyle: paragraph]
+        textView.textStorage.addAttributes(myAttribute, range: currentLineRange)
     }
+
 
     private func changeSelectedTextColorWithName(font: UIColor) {
         let selectedText = textView.selectedRange
